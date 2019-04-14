@@ -5,27 +5,31 @@
 
 using namespace std;
 
+struct Pair{
+    double lenght;
+    string desc;
+};
+
 struct Bar
 {
-public:
     Bar(double defaultLength):leftLength(defaultLength),
         defaultLength(defaultLength){}
     Bar() = delete;
 
-    bool TryAdd(double nextBar, bool first = false)
+    bool TryAdd(Pair nextBar, bool first = false)
     {
         if(first)
         {
-            barsNumber = floor(nextBar/defaultLength);
+            barsNumber = floor(nextBar.lenght/defaultLength);
             parts.push_back(nextBar);
-            leftLength -= (nextBar - (barsNumber * defaultLength));
+            leftLength -= (nextBar.lenght - (barsNumber * defaultLength));
             barsNumber++;
             return true;
         }
-        if(leftLength >= nextBar)
+        if(leftLength >= nextBar.lenght)
         {
             parts.push_back(nextBar);
-            leftLength -= nextBar;
+            leftLength -= nextBar.lenght;
             return true;
         }
         else
@@ -34,26 +38,36 @@ public:
         }
     }
 
-    int Show()
+    int Show(const double oneLength)
     {
-        cout << "listew w zestawie: " << barsNumber << endl;
+        double usedLength = 0.0;
+        cout << "\tlistew w zestawie: " << barsNumber << endl;
         for(auto i:parts)
         {
-            cout << "   " << i << endl;
+            usedLength += i.lenght;
+            cout << "\t\t" << i.lenght << "\t" << i.desc << endl;
         }
+        double fullLength = oneLength;
+        while(fullLength < usedLength)
+        {
+            fullLength += oneLength;
+        }
+        cout << "\tresztek w zestawie: " << fullLength - usedLength << endl;
+
         return barsNumber;
     }
 
-    vector<double> parts;
+    vector<Pair> parts;
     double leftLength;
     double defaultLength;
     int barsNumber = 0;
 };
 
-int count(vector<double>& v, double oneLength)
+int count(vector<Pair>& v, double oneLength)
 {
+    double sum = accumulate(v.begin(), v.end(), 0.0, [](double sum, const Pair& pair){return sum + pair.lenght;});
     vector<Bar> bars;
-    sort(v.begin(), v.end(), std::greater<double>());
+    sort(v.begin(), v.end(), [](const Pair& a, const Pair& b) -> bool {return a.lenght > b.lenght;});
     int currentBar = -1;
     while(v.size())
     {
@@ -69,7 +83,7 @@ int count(vector<double>& v, double oneLength)
             found = false;
             for(unsigned int i=0;i<v.size();++i)
             {
-                if(v[i]>oneLength)
+                if(v[i].lenght>oneLength)
                 {
                     continue;
                 }
@@ -86,45 +100,40 @@ int count(vector<double>& v, double oneLength)
     for(unsigned int i=0;i<bars.size();i++)
     {
         cout << "paczka: " << i+1 << endl;
-        barsNumber += bars[i].Show();
+        barsNumber += bars[i].Show(oneLength);
     }
+    cout << "niewykorzystanego materialu: " << (barsNumber*oneLength)-sum << endl;
     return barsNumber;
 }
 
 int main()
 {
-    vector<double> v = {
-        //salon
-        3.49,
-        0.67,
-        4.69,
-        3.47,
-        2.01,
-        0.23,
-        1.16,
-        0.15,
-        0.88,
-        2.21,
-        0.21,
-        0.14,
-        0.81,
-        0.37,
-        0.7 ,
-        0.62,
-        0.54,
-        0.15,
-        // sypialnia1
-        2.91,
-        3.35,
-        3.35,
-        1.87,
-        //sypialnia2
-        3.35,
-        0.26,
-        2.73,
-        2.91
+    vector<Pair> v = {
+        {14.2,  "1" },
+        {51.3,  "2" },
+        {59.5,  "3" },
+        {70,    "4" },
+        {35.6,  "5" },
+        {76.1,  "6" },
+        {14.4,  "7" },
+        {21.1,  "8" },
+        {220.3, "9" },
+        {79,    "10" },
+        {13.3,  "11" },
+        {115.6, "12" },
+        {25.6,  "13" },
+        {288.4, "15" },
+        {330.4, "16" },
+        {22.6,  "18" },
+        {200.1, "24" },
+        {459.9, "25" },
+        {64.8,  "26" },
+        {17.6,  "27" },
+        {17.1,  "29" },
+        {348.6, "30" },
+        {344.3, "31" },
     };
-    const double defaultLen = 2.5;
+    const double defaultLen = 250.0;
     cout << "Dlugosc jednej listwy: " << defaultLen << endl;
     cout << "lacznie potrzebnych listew: " << count(v, defaultLen) << endl;
 }
