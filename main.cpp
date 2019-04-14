@@ -4,15 +4,16 @@
 #include <vector>
 
 using namespace std;
+typedef double length_t;
 
 struct Pair{
-    double lenght;
+    length_t lenght;
     string desc;
 };
 
 struct Bar
 {
-    Bar( double defaultLength ):m_leftLength( defaultLength ),
+    Bar( const length_t defaultLength ):m_leftLength( defaultLength ),
         m_defaultLength( defaultLength ){}
     Bar() = delete;
 
@@ -38,16 +39,16 @@ struct Bar
         }
     }
 
-    int Show( const double oneLength )
+    int Show( const length_t oneLength )
     {
-        double usedLength = 0.0;
+        length_t usedLength = 0.0;
         cout << "\tlistew w zestawie: " << m_barsNumber << endl;
         for( const auto i:m_parts )
         {
             usedLength += i.lenght;
             cout << "\t\t" << i.lenght << "\t" << i.desc << endl;
         }
-        double fullLength = oneLength;
+        length_t fullLength = oneLength;
         while( fullLength < usedLength )
         {
             fullLength += oneLength;
@@ -58,14 +59,14 @@ struct Bar
     }
 
     vector<Pair> m_parts;
-    double m_leftLength;
-    const double m_defaultLength;
+    length_t m_leftLength;
+    const length_t m_defaultLength;
     int m_barsNumber = 0;
 };
 
-int count( vector<Pair>& v, double oneLength )
+int count( vector<Pair>& v, length_t oneLength )
 {
-    const double sum = accumulate( v.begin(), v.end(), 0.0, []( double sum, const Pair& pair ){ return sum + pair.lenght; } );
+    const length_t sum = accumulate( v.begin(), v.end(), 0.0, []( length_t sum, const Pair& pair ){ return sum + pair.lenght; } );
     vector<Bar> bars;
     sort( v.begin(), v.end(), []( const Pair& a, const Pair& b ) -> bool { return a.lenght > b.lenght; } );
     int currentBar = -1;
@@ -133,7 +134,7 @@ int main()
         { 348.6, "30" },
         { 344.3, "31" },
     };
-    const double defaultLen = 250.0;
+    const length_t defaultLen = 250.0;
     cout << "Dlugosc jednej listwy: " << defaultLen << endl;
     cout << "lacznie potrzebnych listew: " << count( v, defaultLen ) << endl;
 }
